@@ -28,6 +28,22 @@ defmodule MingleMeWeb.UserLive.Settings do
       </.form>
 
       <div class="divider" />
+      <.form for={@interests_form} id="interests-form" phx-submit="update_interests">
+        <.input
+          field={@interests_form[:interests]}
+          type="checkgroup"
+          label="Interests"
+          multiple={true}
+          options={[
+            {"Male", "male"},
+            {"Female", "female"}
+          ]}
+        />
+        <footer>
+          <.button phx-disable-with="Saving..." variant="primary">Change Interests</.button>
+        </footer>
+      </.form>
+      <div class="divider" />
 
       <.form
         for={@password_form}
@@ -84,12 +100,14 @@ defmodule MingleMeWeb.UserLive.Settings do
     user = socket.assigns.current_scope.user
     email_changeset = Accounts.change_user_email(user, %{}, validate_unique: false)
     password_changeset = Accounts.change_user_password(user, %{}, hash_password: false)
+    interests_changeset = Accounts.change_user_interests(user, %{})
 
     socket =
       socket
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
+      |> assign(:interests_form, to_form(interests_changeset))
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
@@ -127,6 +145,13 @@ defmodule MingleMeWeb.UserLive.Settings do
       changeset ->
         {:noreply, assign(socket, :email_form, to_form(changeset, action: :insert))}
     end
+  end
+
+  def handle_event("update_interests", params, socket) do
+    %{"user" => user_params} = params
+
+    IO.inspect(user_params)
+    {:noreply, socket}
   end
 
   def handle_event("validate_password", params, socket) do

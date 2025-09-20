@@ -150,7 +150,7 @@ defmodule MingleMeWeb.CoreComponents do
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               search select tel text textarea time url week)
+               search select tel text textarea time url week checkgroup)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -241,6 +241,34 @@ defmodule MingleMeWeb.CoreComponents do
           {@rest}
         >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
       </label>
+      <.error :for={msg <- @errors}>{msg}</.error>
+    </div>
+    """
+  end
+
+  def input(%{type: "checkgroup"} = assigns) do
+    ~H"""
+    <div phx-feedback-for={@name} class="text-sm">
+      <label for={@id}>{@label}</label>
+      <div class="mt-1 w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        <div class="grid grid-cols-1 gap-1 text-sm items-baseline">
+          <input type="hidden" name={@name} value="" />
+          <div :for={{label, value} <- @options} class="flex items-center">
+            <label for={"#{@name}-#{value}"} class="font-medium text-gray-700">
+              <input
+                type="checkbox"
+                id={"#{@name}-#{value}"}
+                name={@name}
+                value={value}
+                checked={value in @value}
+                class="mr-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                {@rest}
+              />
+              {label}
+            </label>
+          </div>
+        </div>
+      </div>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """

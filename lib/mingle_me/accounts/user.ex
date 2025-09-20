@@ -1,4 +1,5 @@
 defmodule MingleMe.Accounts.User do
+  alias MingleMe.ChangesetHelpers
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,10 +9,17 @@ defmodule MingleMe.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
-    field :interests, {:array, string}
+    field :interests, {:array, :string}
 
     timestamps(type: :utc_datetime)
   end
+
+  @interest_options [
+    {"Male", "male"},
+    {"Female", "female"}
+  ]
+
+  def interest_options, do: @interest_options
 
   @doc """
   A user changeset for registering or changing the email.
@@ -28,6 +36,17 @@ defmodule MingleMe.Accounts.User do
     user
     |> cast(attrs, [:email])
     |> validate_email(opts)
+  end
+
+  def interests_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:interests])
+    |> common_validations()
+  end
+
+  defp common_validations(changeset) do
+    changeset
+    |> ChangesetHelpers.clean_and_validate_array(:interests, @interest_options)
   end
 
   defp validate_email(changeset, opts) do

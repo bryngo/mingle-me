@@ -111,6 +111,10 @@ defmodule MingleMe.Accounts do
     User.email_changeset(user, attrs, opts)
   end
 
+  def change_user_interests(user, attrs \\ %{}, opts \\ []) do
+    User.interests_changeset(user, attrs, opts)
+  end
+
   @doc """
   Updates the user email using the given token.
 
