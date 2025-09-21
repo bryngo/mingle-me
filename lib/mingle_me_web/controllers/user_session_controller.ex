@@ -51,6 +51,8 @@ defmodule MingleMeWeb.UserSessionController do
     true = Accounts.sudo_mode?(user)
     {:ok, {_user, expired_tokens}} = Accounts.update_user_password(user, user_params)
 
+    IO.puts("Updating user password from session controller...")
+
     # disconnect all existing LiveViews with old sessions
     UserAuth.disconnect_sessions(expired_tokens)
 
@@ -58,6 +60,26 @@ defmodule MingleMeWeb.UserSessionController do
     |> put_session(:user_return_to, ~p"/users/settings")
     |> create(params, "Password updated successfully!")
   end
+
+  # def update_interests(conn, %{"user" => user_params}) do
+  #   user = conn.assigns.current_scope.user
+  #   true = Accounts.sudo_mode?(user)
+  #   IO.puts("Updating user interests...")
+
+  #   case Accounts.update_user_interests(user, user_params) do
+  #     {:ok, _user} ->
+  #       conn
+  #       |> put_flash(:info, "Interests updated successfully.")
+  #       |> redirect(to: ~p"/users/settings")
+
+  #     {:error, changeset} ->
+  #       conn
+  #       |> put_flash(:error, "Failed to update interests.")
+  #       |> put_flash(:interests_errors, changeset.errors)
+  #       |> put_flash(:interests_data, user_params["interests"])
+  #       |> redirect(to: ~p"/users/settings")
+  #   end
+  # end
 
   def delete(conn, _params) do
     conn

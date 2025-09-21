@@ -171,6 +171,12 @@ defmodule MingleMe.Accounts do
     |> update_user_and_delete_all_tokens()
   end
 
+  def update_user_interests(user, attrs) do
+    user
+    |> User.interests_changeset(attrs)
+    |> Repo.update()
+  end
+
   ## Session
 
   @doc """

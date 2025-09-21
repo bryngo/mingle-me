@@ -21,6 +21,16 @@ defmodule MingleMe.Seasons do
     Repo.all(Season)
   end
 
+  def list_seasons_with_enrollment_counts do
+    query =
+      from s in Season,
+        left_join: p in assoc(s, :enrollments),
+        group_by: s.id,
+        select: {s, count(p.id)}
+
+    Repo.all(query)
+  end
+
   @doc """
   Gets a single season.
 

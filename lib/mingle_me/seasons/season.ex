@@ -8,6 +8,8 @@ defmodule MingleMe.Seasons.Season do
     field :end_time, :utc_datetime
     field :max_participants, :integer
 
+    has_many :enrollments, MingleMe.Enrollments.Enrollment, foreign_key: :season_id
+
     timestamps(type: :utc_datetime)
   end
 

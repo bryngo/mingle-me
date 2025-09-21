@@ -105,6 +105,7 @@ defmodule MingleMeWeb.UserLive.Settings do
     socket =
       socket
       |> assign(:current_email, user.email)
+      |> assign(:current_interests, user.interests || [])
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:interests_form, to_form(interests_changeset))
@@ -150,8 +151,17 @@ defmodule MingleMeWeb.UserLive.Settings do
   def handle_event("update_interests", params, socket) do
     %{"user" => user_params} = params
 
-    IO.inspect(user_params)
-    {:noreply, socket}
+    user = socket.assigns.current_scope.user
+    true = Accounts.sudo_mode?(user)
+
+    case Accounts.change_user_interests(user, user_params) do
+      %{valid?: true} = changeset ->
+        Accounts.update_user_interests(user, user_params)
+        {:noreply, assign(socket, interests_form: to_form(changeset))}
+
+      changeset ->
+        {:noreply, assign(socket, interests_form: to_form(changeset, action: :insert))}
+    end
   end
 
   def handle_event("validate_password", params, socket) do

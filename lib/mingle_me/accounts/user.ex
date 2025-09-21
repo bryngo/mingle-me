@@ -11,6 +11,8 @@ defmodule MingleMe.Accounts.User do
     field :authenticated_at, :utc_datetime, virtual: true
     field :interests, {:array, :string}
 
+    has_many :enrollments, MingleMe.Enrollments.Enrollment, foreign_key: :user_id
+
     timestamps(type: :utc_datetime)
   end
 
@@ -18,6 +20,8 @@ defmodule MingleMe.Accounts.User do
     {"Male", "male"},
     {"Female", "female"}
   ]
+
+  @valid_interests Enum.map(@interest_options, fn {_text, val} -> val end)
 
   def interest_options, do: @interest_options
 
@@ -38,15 +42,24 @@ defmodule MingleMe.Accounts.User do
     |> validate_email(opts)
   end
 
-  def interests_changeset(user, attrs, opts \\ []) do
-    user
-    |> cast(attrs, [:interests])
-    |> common_validations()
+  def interests_changeset(user, attrs, _opts \\ []) do
+    changeset =
+      user
+      |> cast(attrs, [:interests])
+      |> common_validations()
+
+    interests = get_change(changeset, :interests)
+
+    if interests do
+      put_change(changeset, :interests, interests)
+    else
+      changeset
+    end
   end
 
   defp common_validations(changeset) do
     changeset
-    |> ChangesetHelpers.clean_and_validate_array(:interests, @interest_options)
+    |> ChangesetHelpers.clean_and_validate_array(:interests, @valid_interests)
   end
 
   defp validate_email(changeset, opts) do

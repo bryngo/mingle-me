@@ -4,7 +4,8 @@ defmodule MingleMe.Enrollments.Enrollment do
 
   schema "enrollments" do
     field :user_id, :integer
-    field :season_id, :integer
+
+    belongs_to :season, MingleMe.Seasons.Season, foreign_key: :season_id
 
     timestamps(type: :utc_datetime)
   end
